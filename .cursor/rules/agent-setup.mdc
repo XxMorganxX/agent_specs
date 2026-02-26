@@ -1,0 +1,27 @@
+---
+description: Explains the agent-spec workspace structure and how it provides cross-project guidance
+alwaysApply: true
+---
+
+# Agent Spec Workspace
+
+This workspace uses a multi-root layout where `agent-spec/` exists as an independent repository alongside the main project. Both folders are added to the same Cursor workspace, allowing rules from each to auto-load into agent context.
+
+## How This Works
+
+- `agent-spec/` contains Cursor rules (`.cursor/rules/*.mdc`) that define how you should approach coding tasks
+- These rules apply across any project that shares a workspace with this folder
+- The main project has its own git history; agent-spec has its own — they're fully independent
+
+## Your Behavior
+
+When working in this workspace:
+
+1. **Focus edits on the main project** — agent-spec is configuration, not the codebase you're building
+2. **Consult the rules here** for guidance on design, documentation, and coding principles
+3. **Do not modify agent-spec** unless explicitly asked to update these rules
+4. **Treat these rules as preferences** — they describe how I want you to think about code, not rigid constraints
+
+## Updating Agent Spec
+
+If I ask you to update agent rules or add new guidance, edit files in `agent-spec/.cursor/rules/`. This repo can be pushed/pulled independently to keep these preferences synced across machines and projects.

@@ -1,0 +1,78 @@
+---
+description: Codebase design and documentation principles to consider when making edits
+alwaysApply: true
+---
+
+# Design and Documentation Principles
+
+These principles should actively inform how you write and organize code in the main project.
+
+## Code Organization
+
+- Keep related code close together — colocate files that change together
+- Prefer flat structures over deep nesting until complexity demands otherwise
+- Group by feature or domain, not by technical layer, when it makes the codebase easier to navigate
+- When adding new code, look for existing patterns first and follow them
+
+## Component Independence and Feature Abstraction
+
+In larger codebases, major subsystems (database management, AI/ML integrations, user interface, external APIs, etc.) should be treated as independent, swappable components.
+
+### Core Principle
+
+Any component fulfilling a defined role should be replaceable without requiring changes to the components it communicates with. For example, in a voice agent with TTS, STT, and AI layers, swapping the TTS provider should require zero changes to the STT and AI layers.
+
+### How to Achieve This
+
+- **Define interface layers between components** — each component exposes a contract (abstract class, protocol, interface, or typed function signatures) that other components depend on, never the concrete implementation
+- **Keep provider-specific logic contained** — all details about a particular vendor, library, or service stay inside that component's implementation; nothing leaks into shared code
+- **Depend on abstractions, not implementations** — when one component calls another, it should reference the interface, not the specific provider behind it
+- **Configuration drives which implementation is used** — swapping a provider should be a configuration or wiring change, not a code change across multiple components
+
+### When Building New Features
+
+- Identify which part of the system is a distinct component with a clear responsibility
+- Before integrating it with the rest of the codebase, define the interface it should expose
+- Build the concrete implementation behind that interface
+- Wire it up through a single entry point (factory, config, dependency injection) so it can be swapped later
+
+## Simplicity and Readability
+
+- Write code that's obvious over code that's clever
+- Favor explicit over implicit — make dependencies and data flow visible
+- Keep functions focused on a single responsibility
+- If a function needs extensive comments to explain, consider restructuring it instead
+
+## Naming
+
+- Names should describe what something is or does, not how it's implemented
+- Be consistent with existing naming conventions in the codebase
+- Longer, descriptive names are better than short, ambiguous ones
+- Avoid abbreviations unless they're universally understood in the domain
+
+## Documentation
+
+- Document the "why" not the "what" — code shows what it does, comments explain intent
+- Keep documentation close to the code it describes
+- Update docs when you change the code they reference
+- Prefer self-documenting code structure over extensive inline comments
+
+## When Adding Features
+
+- Understand the existing approach before introducing new patterns
+- Ask if a simpler solution exists before building something complex
+- Consider how this change affects the rest of the codebase
+- Avoid premature abstraction — wait until you see repetition before extracting
+
+## When Refactoring
+
+- Make the smallest change that achieves the goal
+- Separate refactoring commits from feature commits when practical
+- Preserve existing behavior unless explicitly changing it
+- Leave the code better than you found it, but don't boil the ocean
+
+## Quality Expectations
+
+- New code should work correctly before optimizing for anything else
+- Consider edge cases and error handling as part of the initial implementation
+- If tests exist, keep them passing; if adding significant logic, consider adding tests
