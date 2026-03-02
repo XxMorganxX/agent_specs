@@ -22,23 +22,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Group by feature or domain, not by technical layer
 - When adding new code, look for existing patterns first and follow them
 
-## Component Independence
+## Component Independence and Feature Abstraction
 
-Major subsystems (database, AI/ML integrations, UI, external APIs, etc.) should be treated as independent, swappable components.
+In larger codebases, major subsystems (database management, AI/ML integrations, user interface, external APIs, etc.) should be treated as independent, swappable components.
+
+### Core Principle
+
+Any component fulfilling a defined role should be replaceable without requiring changes to the components it communicates with. For example, in a voice agent with TTS, STT, and AI layers, swapping the TTS provider should require zero changes to the STT and AI layers.
+
+### How to Achieve This
 
 - **Define interface layers between components** — each component exposes a contract (abstract class, protocol, interface, or typed function signatures) that other components depend on, never the concrete implementation
-- **Keep provider-specific logic contained** — all details about a vendor, library, or service stay inside that component; nothing leaks into shared code
-- **Depend on abstractions, not implementations** — when one component calls another, it references the interface, not the specific provider
-- **Configuration drives which implementation is used** — swapping a provider should be a config or wiring change, not a code change across multiple files
+- **Keep provider-specific logic contained** — all details about a particular vendor, library, or service stay inside that component's implementation; nothing leaks into shared code
+- **Depend on abstractions, not implementations** — when one component calls another, it should reference the interface, not the specific provider behind it
+- **Configuration drives which implementation is used** — swapping a provider should be a configuration or wiring change, not a code change across multiple components
 
-When building a new feature that touches a distinct subsystem: define its interface first, build the implementation behind it, wire it up through a single entry point (factory, config, or dependency injection).
+### When Building New Features
+
+- Identify which part of the system is a distinct component with a clear responsibility
+- Before integrating it with the rest of the codebase, define the interface it should expose
+- Build the concrete implementation behind that interface
+- Wire it up through a single entry point (factory, config, dependency injection) so it can be swapped later
 
 ## Simplicity and Readability
 
 - Write code that's obvious over code that's clever
 - Favor explicit over implicit — make dependencies and data flow visible
 - Keep functions focused on a single responsibility
-- Avoid premature abstraction — wait until you see repetition before extracting
+- If a function needs extensive comments to explain, consider restructuring it instead
 
 ## Naming
 
@@ -51,6 +62,7 @@ When building a new feature that touches a distinct subsystem: define its interf
 
 - Document the "why" not the "what" — code shows what it does, comments explain intent
 - Keep documentation close to the code it describes
+- Update docs when you change the code they reference
 - Prefer self-documenting structure over extensive inline comments
 
 ## When Adding Features
@@ -58,12 +70,20 @@ When building a new feature that touches a distinct subsystem: define its interf
 - Understand the existing approach before introducing new patterns
 - Ask if a simpler solution exists before building something complex
 - Consider how the change affects the rest of the codebase
+- Avoid premature abstraction — wait until you see repetition before extracting
 
 ## When Refactoring
 
 - Make the smallest change that achieves the goal
-- Preserve existing behavior unless explicitly changing it
 - Separate refactoring commits from feature commits when practical
+- Preserve existing behavior unless explicitly changing it
+- Leave the code better than you found it, but don't boil the ocean
+
+## Quality Expectations
+
+- New code should work correctly before optimizing for anything else
+- Consider edge cases and error handling as part of the initial implementation
+- If tests exist, keep them passing; if adding significant logic, consider adding tests
 
 ---
 
